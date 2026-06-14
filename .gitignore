@@ -1,0 +1,9 @@
+#Not including this file just for DEMO, otherwise .env should be 
+#included to avoid being pushed in the public remote
+
+#.env
+
+
+#Also not includeing secrets folder for DEMO...
+
+#secrets/

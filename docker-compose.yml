@@ -7,9 +7,12 @@ services:
     container_name: postgres-db
 
     environment:
-      POSTGRES_DB: student
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+
+    secrets:
+      - postgres_password
 
     ports:
       - "5432:5432"
@@ -35,9 +38,11 @@ services:
       - postgres
 
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/student
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+
+    secrets:
+      - postgres_password
 
     networks:
       - full-stack-spring-boot-react
@@ -64,3 +69,7 @@ volumes:
 networks:
   full-stack-spring-boot-react:
     driver: bridge
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
