@@ -1,10 +1,28 @@
+# I used this docker-compose from the repo: 
+#https://github.com/Ashir-Qayyum/sensiply-training-docker-poc
+# This time I had to deploy the app on k8s. For k8s manifests,
+# I am using the kompose.io (https://kompose.io/) for manifest
+# generation. It required docker-compose file and convert it to
+# manifest files.
+# For that I had to modify this a lit bit to clean it up like removing
+# networks, depends_on, restart policies, container_names etc.
+# I installed kompose, and converted this docker-compose into k8s
+# manifests using the command as guided in their site. 
+# I then shifted the manifests to the folder: k8s_manifests
+# THen I modified the manifest a little bit like
+# removing annotations, and modifying other properties, and also
+# especially secrets file then 
+# I manually built the images, and pushed it to dockerhub,
+# and then applied the manifests with: kubectl apply -f .
+# My all three pods i.e. postgres, frontend, and backend set up
+
+
 version: "3.9"
 
 services:
 
   postgres:
     image: postgres:16
-    container_name: postgres-db
 
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -15,27 +33,20 @@ services:
       - postgres_password
 
     ports:
-      - "5432:5432"
+      - "5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-    networks:
-      - full-stack-spring-boot-react
+
 
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ashirqayyum/sms-backend:1.0
 
-    container_name: spring-backend
-    restart: always
 
     ports:
-      - "8080:8080"
+      - "8080"
 
-    depends_on:
-      - postgres
 
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
@@ -44,31 +55,18 @@ services:
     secrets:
       - postgres_password
 
-    networks:
-      - full-stack-spring-boot-react
 
   frontend:
-    build:
-      context: ./src/frontend
-      dockerfile: Dockerfile
+    image: ashirqayyum/sms-frontend:1.0
 
-    container_name: react-frontend
 
     ports:
-      - "3000:80"
+      - "80"
 
-    depends_on:
-      - backend
-
-    networks:
-      - full-stack-spring-boot-react
 
 volumes:
   postgres_data:
 
-networks:
-  full-stack-spring-boot-react:
-    driver: bridge
 
 secrets:
   postgres_password:
